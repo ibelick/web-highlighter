@@ -35,18 +35,18 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="whs-flex whs-flex-col">
       <form onSubmit={onSubmit}>
         <input
           placeholder="Email"
           type="email"
           onChange={(e) => setEmail(e.target.value)}
-          className="border border-gray-300 font-sans focus:shadow-outline w-full appearance-none rounded bg-white py-4 px-4 leading-tight text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:border-teal-200"
+          className="whs-border whs-border-gray-300 whs-font-sans whs-focus:whs-shadow-outline whs-w-full whs-appearance-none whs-rounded whs-bg-white whs-py-4 whs-px-4 whs-leading-tight whs-text-gray-700 whs-placeholder:whs-text-gray-400 whs-focus:outline-none whs-focus:whs-ring-1 whs-focus:whs-border-teal-200"
         />
         <input
           placeholder="Name"
           onChange={(e) => setName(e.target.value)}
-          className="border border-gray-300 font-sans focus:shadow-outline w-full appearance-none rounded bg-white py-4 px-4 leading-tight text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:border-teal-200"
+          className="whs-border whs-border-gray-300 whs-font-sans whs-focus:whs-shadow-outline whs-w-full whs-appearance-none whs-rounded whs-bg-white whs-py-4 whs-px-4 whs-leading-tight whs-text-gray-700 whs-placeholder:whs-text-gray-400 whs-focus:outline-none whs-focus:whs-ring-1 whs-focus:whs-border-teal-200"
         />
         <button
           type="submit"

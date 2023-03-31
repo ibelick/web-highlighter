@@ -42,9 +42,9 @@ const HighlightList = () => {
 
 const Popup = () => {
   return (
-    <div className="w-72">
-      <div className="p-4">
-        <h1 className="text-base mb-4 font-medium">
+    <div className="whs-w-72">
+      <div className="whs-p-4">
+        <h1 className="whs-text-base whs-mb-4 whs-font-medium">
           Chrome Extension with ReactJs and
         </h1>
         <SignUp />
