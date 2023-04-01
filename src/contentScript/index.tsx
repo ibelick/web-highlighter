@@ -5,16 +5,10 @@ import { ContentScript } from "./ContentScript";
 import type { Highlight } from "../types/notes";
 
 const highlightPage = () => {
-  // get current url
   const currentUrl = window.location.href;
-
-  console.log("url", currentUrl);
-  // filter items by url
 
   chrome.storage.local.get((items) => {
     const currentUrlItems: Highlight[] = items[currentUrl];
-
-    console.log("currentUrlItems", currentUrlItems);
 
     return currentUrlItems.forEach((item) => {
       const text = item.text;

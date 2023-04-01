@@ -24,7 +24,15 @@ export const signUp = async (
   return response.json();
 };
 
-export const getToken = async (email: string): Promise<unknown> => {
+type TokenResponse = {
+  expriesIn: string;
+  idToken: string;
+  isNewUser: boolean;
+  kind: string;
+  refreshToken: string;
+};
+
+export const getToken = async (email: string): Promise<TokenResponse> => {
   const response = await fetch(`${BASE_URL}auth/token/`, {
     method: "POST",
     headers: {

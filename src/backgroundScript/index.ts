@@ -20,15 +20,13 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       html: selectedText,
       entity_type: "contribution.highlight",
     };
-    // chrome.storage.local.get(tabUrl, (data) => {
-    const hightlightForUrl = {
-      [tabUrl]: [
-        // ...data,
-        highlight,
-      ],
-    };
-    chrome.storage.local.set(hightlightForUrl);
-    chrome.runtime.sendMessage({ type: "highlightAdded" });
-    // });
+
+    chrome.storage.local.get(tabUrl, (data) => {
+      const highlightsForUrl = data[tabUrl] || [];
+      const updatedHighlightsForUrl = [...highlightsForUrl, highlight];
+
+      chrome.storage.local.set({ [tabUrl]: updatedHighlightsForUrl });
+      chrome.runtime.sendMessage({ type: "highlightAdded" });
+    });
   }
 });

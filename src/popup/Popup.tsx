@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import SignUp from "./SignUp";
-import { getPreview } from "./api/notes";
+import { addEntity, getPreview } from "./api/notes";
 import type { GetPreviewResponse } from "./api/notes";
 import type { Highlight } from "../types/notes";
+import { getToken } from "./api/auth";
 
-type Highlights = {
-  [id: string]: Highlight;
-};
+type Highlights = Highlight[];
 
 const LoginContent = () => {
   const [metadata, setMetadata] = useState<GetPreviewResponse | null>(null);
@@ -14,11 +13,10 @@ const LoginContent = () => {
   const [currentTabInfo, setCurrentTabInfo] = useState<chrome.tabs.Tab | null>(
     null
   );
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     const getPreviewLinkMetadata = async (url: string) => {
-      console.log("get preview link metadata");
-
       const idToken = localStorage.getItem("token-whs");
       const data = await getPreview(url, idToken);
 
@@ -35,35 +33,34 @@ const LoginContent = () => {
         setHighlights(highlights);
       });
     });
-  }, []);
+  }, [token]);
+
+  const refreshToken = async () => {
+    const data = await getToken("test@test.com");
+    localStorage.setItem("token-whs", data.idToken);
+    setToken(data.idToken);
+  };
 
   const onSave = async () => {
-    const idToken = localStorage.getItem("token-whs");
-    const entity = {
-      url: currentTabInfo?.url,
-      entityType: metadata?.entity_type,
-      name: metadata?.name,
-      description: metadata?.description,
-      thumbnail: metadata?.thumbnail,
-      domain: metadata?.domain,
-      contributions: Object.values(highlights!),
-      idToken,
-    };
-    console.log(entity);
-    console.log(idToken);
+    if (!metadata || !highlights || !currentTabInfo) {
+      return;
+    }
 
-    //   url: string,
-    // entityType: string,
-    // name: string,
-    // description: string,
-    // thumbnail: string,
-    // domain: string,
-    // contributions: {
-    //   entity_type: string;
-    //   text: string;
-    //   html: string;
-    // }[],
-    // idToken: string
+    const idToken = localStorage.getItem("token-whs");
+    const data = await addEntity(
+      currentTabInfo.url,
+      metadata.entity_type,
+      metadata.name,
+      metadata.description,
+      metadata.thumbnail,
+      metadata.domain,
+      highlights,
+      idToken
+    );
+
+    if (data) {
+      alert("Link saved");
+    }
   };
 
   return (
@@ -96,24 +93,9 @@ const LoginContent = () => {
         <div className="whs-mt-4" onClick={onSave}>
           Save link
         </div>
+        <div onClick={refreshToken}>refresh token</div>
       </div>
     </div>
-  );
-};
-
-const Hightlight = () => {
-  const [color, setColor] = useState("#FFFF00");
-
-  const handleSaveClick = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(tabs[0].id!, { type: "saveHighlight", color });
-    });
-  };
-
-  return (
-    <>
-      <button onClick={handleSaveClick}>Save</button>
-    </>
   );
 };
 
