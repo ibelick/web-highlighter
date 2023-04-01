@@ -1,3 +1,5 @@
+import { v4 as uuid } from "uuid";
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     title: "Save to Sublime",
@@ -9,8 +11,9 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "saveToSublime") {
     const selectedText = info.selectionText;
-    chrome.storage.local.set({ highlightedText: selectedText }, () => {
-      console.log("Text saved to local storage", selectedText);
-    });
+    const id = uuid();
+    const highlight = { [id]: { text: selectedText, color: "#FFFF00" } };
+    chrome.storage.local.set(highlight);
+    chrome.runtime.sendMessage({ type: "highlightAdded" });
   }
 });

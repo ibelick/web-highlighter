@@ -2,35 +2,57 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import "../assets/css/tailwind.css";
 import { ContentScript } from "./ContentScript";
-import { v4 as uuid } from "uuid";
 
-// function handleSelection() {
-//   const selectedText = window.getSelection().toString();
-//   const id = uuid();
-//   const highlight = { [id]: { text: selectedText, color: "#FFFF00" } };
+const highlightPage = () => {
+  chrome.storage.local.get((items) => {
+    console.log("items", items);
 
-//   const saveHighlight = confirm("Do you want to save this highlight?");
+    Object.keys(items).forEach((key) => {
+      const highlight = items[key];
+      const text = highlight.text;
 
-//   chrome.contextMenus.create({
-//     title: "Save to Sublime",
-//     contexts: ["selection"],
-//     onclick: () => console.log("clicked", highlight),
-//   });
-// }
+      console.log("highlight", highlight);
 
-// const handleContextMenuClick = (info: any, tab: any) => {
-//   const selectedText = info.selectionText;
-//   const id = uuid();
-//   const highlight = { [id]: { text: selectedText, color: "#FFFF00" } };
+      // Search for text within all text nodes on the page
+      const walker = document.createTreeWalker(
+        document.body,
+        NodeFilter.SHOW_TEXT
+      );
+      let node;
+      while ((node = walker.nextNode())) {
+        const textContent = node.textContent;
+        const index = textContent.indexOf(text);
+        if (index !== -1) {
+          // Create a new element to wrap the highlighted text
+          const span = document.createElement("span");
+          span.style.backgroundColor = highlight.color;
+          span.textContent = text;
 
-//   console.log(highlight);
-// };
+          // Split the text node at the index where the text was found
+          const startNode = node.splitText(index);
+          const endNode = startNode.splitText(text.length);
+
+          // Replace the original text node with the wrapped highlighted text
+          startNode.parentNode.replaceChild(span, startNode);
+
+          // Continue the loop from the end of the wrapped text node
+          walker.currentNode = endNode;
+        }
+      }
+    });
+  });
+};
+
+chrome.runtime.onMessage.addListener((message) => {
+  console.log("message received", message);
+
+  if (message.type === "highlightAdded") {
+    highlightPage;
+  }
+});
 
 async function init() {
   console.log("Initializing content script");
-
-  // Listen for the 'mouseup' event to detect when the user finishes selecting text
-  // document.addEventListener("mouseup", handleSelection);
 
   const appContainer = document.createElement("div");
   document.body.appendChild(appContainer);
@@ -41,6 +63,7 @@ async function init() {
 
   const root = createRoot(appContainer);
   root.render(<ContentScript />);
+  highlightPage();
 }
 
 init();

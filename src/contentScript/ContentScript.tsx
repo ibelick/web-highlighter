@@ -9,14 +9,12 @@ export const ContentScript: FunctionComponent = () => {
     });
   };
   return (
-    <div className="sublime-container-app">
-      <div className="absolute top-24 left-0 right-0 flex items-center justify-center">
-        <div className="bg-white px-8 py-4 rounded-lg shadow-xl text-gray-800">
-          <span>This is a content script section</span>
-          <button onClick={clearData} className="bg-red-100">
-            Clear Data
-          </button>
-        </div>
+    <div className="whs-absolute whs-top-24 whs-left-0 whs-right-0 whs-flex whs-items-center whs-justify-center">
+      <div className="bg-white px-8 py-4 rounded-lg shadow-xl text-gray-800">
+        <span>This is a content script section</span>
+        <button onClick={clearData} className="bg-red-100">
+          Clear Data
+        </button>
       </div>
     </div>
   );
