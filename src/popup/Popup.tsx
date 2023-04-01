@@ -111,18 +111,20 @@ const Popup = () => {
   }, []);
 
   return (
-    <div className="whs-w-72">
-      <div className="whs-p-4">
-        <h1 className="whs-text-base whs-mb-4 whs-font-medium">
-          Sublime highlighter
-        </h1>
-        {!isLogedIn ? (
-          <SignUp setIsLogedIn={setIsLogedIn} />
-        ) : (
-          <div className="mb-10">
-            <LoginContent />
-          </div>
-        )}
+    <div id="app">
+      <div className="whs-w-72">
+        <div className="whs-p-4">
+          <h1 className="whs-text-base whs-mb-4 whs-font-medium">
+            Sublime highlighter
+          </h1>
+          {!isLogedIn ? (
+            <SignUp setIsLogedIn={setIsLogedIn} />
+          ) : (
+            <div className="mb-10">
+              <LoginContent />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

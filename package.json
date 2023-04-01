@@ -13,6 +13,7 @@
     "dotenv": "^16.0.3",
     "dotenv-webpack": "^8.0.1",
     "fs": "^0.0.1-security",
+    "mark.js": "^8.11.1",
     "postcss-parent-selector": "^1.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
