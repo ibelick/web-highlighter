@@ -1,26 +1,24 @@
 import React, { useState } from "react";
 import { getToken, signUp } from "./api/auth";
 
-const SignUp = () => {
+type SignUpProps = {
+  setIsLogedIn: (isLogedIn: boolean) => void;
+};
+
+const SignUp = ({ setIsLogedIn }: SignUpProps) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log("email", email);
-    console.log("name", name);
-
     const CONTINUE_URL_BASE = "http://localhost:3000";
 
     try {
-      const data = await signUp({
-        email,
-        name,
-        continue_url: CONTINUE_URL_BASE,
-      });
+      const data = await signUp(email, name, CONTINUE_URL_BASE);
 
-      console.log("data", data);
+      localStorage.setItem("token-whs", data.id_token);
+      setIsLogedIn(true);
     } catch (error) {
       console.log(error);
     }
@@ -50,12 +48,11 @@ const SignUp = () => {
         />
         <button
           type="submit"
-          className="font-sans inline-flex appearance-none items-center rounded-full px-6 py-3 text-sm font-medium drop-shadow-sm transition focus:ring-4 focus:ring-gray-300 null bg-teal-700 text-white hover:bg-teal-800"
+          className="whs-font-sans whs-inline-flex whs-appearance-none whs-items-center whs-rounded-full whs-px-6 whs-py-3 whs-text-sm whs-font-medium whs-drop-shadow-sm whs-transition whs-focus:whs-ring-4 focus:whs-ring-gray-300 whs-bg-teal-700 whs-text-white hover:whs-bg-teal-800"
         >
           Sign Up
         </button>
       </form>
-      <div>test refresh token</div>
       <button onClick={refreshToken} type="button">
         Refresh Token
       </button>

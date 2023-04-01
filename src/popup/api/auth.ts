@@ -1,16 +1,15 @@
-const BASE_URL = "https://staging.sublime.app/api/v2/";
+import { BASE_URL } from "./url";
 
-type SignupRequest = {
-  email: string;
-  name: string;
-  continue_url: string;
+type SignupResponse = {
+  id_token: string;
+  refresh_token: string;
 };
 
-export const signUp = async ({
-  email,
-  name,
-  continue_url,
-}: SignupRequest): Promise<unknown> => {
+export const signUp = async (
+  email: string,
+  name: string,
+  continue_url: string
+): Promise<SignupResponse> => {
   const response = await fetch(`${BASE_URL}auth/sign-up/`, {
     method: "POST",
     headers: {

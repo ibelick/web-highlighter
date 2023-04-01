@@ -1,5 +1,42 @@
 import React, { useEffect, useState } from "react";
 import SignUp from "./SignUp";
+import { getPreview } from "./api/notes";
+import type { GetPreviewResponse } from "./api/notes";
+
+const WebsiteMetadata = () => {
+  const [metadata, setMetadata] = useState<GetPreviewResponse | null>(null);
+
+  useEffect(() => {
+    const getPreviewLinkMetadata = async (url: string) => {
+      console.log("get preview link metadata");
+
+      const idToken = localStorage.getItem("token-whs");
+      const data = await getPreview(url, idToken);
+
+      setMetadata(data);
+    };
+
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      getPreviewLinkMetadata(tabs[0].url);
+    });
+  }, []);
+
+  return (
+    <div>
+      {metadata ? (
+        <div>
+          <div>{metadata.description}</div>
+          <div>{metadata.domain}</div>
+          <div>{metadata.entity_type}</div>
+          <div>{metadata.name}</div>
+          <div>{metadata.thumbnail}</div>
+        </div>
+      ) : (
+        <div>Loading...</div>
+      )}
+    </div>
+  );
+};
 
 const Hightlight = () => {
   const [color, setColor] = useState("#FFFF00");
@@ -17,7 +54,7 @@ const Hightlight = () => {
   );
 };
 
-const HighlightList = () => {
+const HighlightListAndSave = () => {
   const [highlights, setHighlights] = useState<any[]>([]);
 
   useEffect(() => {
@@ -25,6 +62,10 @@ const HighlightList = () => {
       setHighlights(result);
     });
   }, []);
+
+  const onSave = () => {
+    console.log("heuyu save");
+  };
 
   return (
     <div>
@@ -36,83 +77,41 @@ const HighlightList = () => {
           </div>
         );
       })}
+      <div className="whs-mt-4" onClick={onSave}>
+        Save link
+      </div>
     </div>
   );
 };
 
 const Popup = () => {
+  const [isLogedIn, setIsLogedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token-whs");
+
+    if (token) {
+      setIsLogedIn(true);
+    }
+  }, []);
+
   return (
     <div className="whs-w-72">
       <div className="whs-p-4">
         <h1 className="whs-text-base whs-mb-4 whs-font-medium">
-          Chrome Extension with ReactJs and
+          Sublime highlighter
         </h1>
-        <SignUp />
-        {/* <div className="mb-10">
-          <HighlightList />
-        </div> 
-        <Hightlight /> */}
+        {!isLogedIn ? (
+          <SignUp setIsLogedIn={setIsLogedIn} />
+        ) : (
+          <div className="mb-10">
+            <WebsiteMetadata />
+            <HighlightListAndSave />
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
-function PopupLocalSave() {
-  const [value, setValue] = useState<string>("");
-
-  const handleSave = () => {
-    chrome.storage.local.set({ key: value }, () => {
-      console.log("Value is set to " + value);
-    });
-  };
-
-  const handleLoad = () => {
-    chrome.storage.local.get(["key"], (result) => {
-      console.log("Value currently is " + result.key);
-      setValue(result.key);
-    });
-  };
-
-  return (
-    <div className="w-72">
-      <div className="p-4">
-        <h1 className="text-base mb-4 font-medium">
-          Chrome Extension with ReactJs and
-        </h1>
-
-        <div className="mb-10">
-          <input
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            className="bg-gray-50 border border-gray-200 w-full rounded-lg px-4 py-2 text-black focus:outline-none mb-5"
-          />
-
-          <div className="flex items-center justify-end">
-            <button
-              onClick={handleSave}
-              className="bg-green-500 hover:bg-green-400 transition duration-300 px-6 py-2 rounded-md text-white text-center"
-            >
-              <span>Save</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="">
-          <p className="text-sm mb-2">Local Storage value</p>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={handleLoad}
-              className="bg-orange-500 hover:bg-orange-400 transition duration-300 px-6 py-2 rounded-md text-white text-center"
-            >
-              Load
-            </button>
-            <span className="text-lg font-semibold">{value}</span>
-          </div>
-        </div>
-      </div>
-      <Hightlight />
-    </div>
-  );
-}
 
 export default Popup;

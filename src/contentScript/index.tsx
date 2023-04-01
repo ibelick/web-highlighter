@@ -5,13 +5,9 @@ import { ContentScript } from "./ContentScript";
 
 const highlightPage = () => {
   chrome.storage.local.get((items) => {
-    console.log("items", items);
-
     Object.keys(items).forEach((key) => {
       const highlight = items[key];
       const text = highlight.text;
-
-      console.log("highlight", highlight);
 
       // Search for text within all text nodes on the page
       const walker = document.createTreeWalker(
