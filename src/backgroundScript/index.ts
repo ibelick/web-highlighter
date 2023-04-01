@@ -1,4 +1,5 @@
 import { v4 as uuid } from "uuid";
+import type { Highlight } from "../types/notes";
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
@@ -9,11 +10,25 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
+  const tabUrl = tab.url;
+
   if (info.menuItemId === "saveToSublime") {
     const selectedText = info.selectionText;
     const id = uuid();
-    const highlight = { [id]: { text: selectedText, color: "#FFFF00" } };
-    chrome.storage.local.set(highlight);
+    const highlight: Highlight = {
+      text: selectedText,
+      html: selectedText,
+      entity_type: "contribution.highlight",
+    };
+    // chrome.storage.local.get(tabUrl, (data) => {
+    const hightlightForUrl = {
+      [tabUrl]: [
+        // ...data,
+        highlight,
+      ],
+    };
+    chrome.storage.local.set(hightlightForUrl);
     chrome.runtime.sendMessage({ type: "highlightAdded" });
+    // });
   }
 });

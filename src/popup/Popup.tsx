@@ -2,9 +2,18 @@ import React, { useEffect, useState } from "react";
 import SignUp from "./SignUp";
 import { getPreview } from "./api/notes";
 import type { GetPreviewResponse } from "./api/notes";
+import type { Highlight } from "../types/notes";
 
-const WebsiteMetadata = () => {
+type Highlights = {
+  [id: string]: Highlight;
+};
+
+const LoginContent = () => {
   const [metadata, setMetadata] = useState<GetPreviewResponse | null>(null);
+  const [highlights, setHighlights] = useState<Highlights | null>(null);
+  const [currentTabInfo, setCurrentTabInfo] = useState<chrome.tabs.Tab | null>(
+    null
+  );
 
   useEffect(() => {
     const getPreviewLinkMetadata = async (url: string) => {
@@ -17,23 +26,77 @@ const WebsiteMetadata = () => {
     };
 
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      setCurrentTabInfo(tabs[0]);
       getPreviewLinkMetadata(tabs[0].url);
+
+      chrome.storage.local.get(null, (result: any) => {
+        const highlights = result[tabs[0].url];
+
+        setHighlights(highlights);
+      });
     });
   }, []);
 
+  const onSave = async () => {
+    const idToken = localStorage.getItem("token-whs");
+    const entity = {
+      url: currentTabInfo?.url,
+      entityType: metadata?.entity_type,
+      name: metadata?.name,
+      description: metadata?.description,
+      thumbnail: metadata?.thumbnail,
+      domain: metadata?.domain,
+      contributions: Object.values(highlights!),
+      idToken,
+    };
+    console.log(entity);
+    console.log(idToken);
+
+    //   url: string,
+    // entityType: string,
+    // name: string,
+    // description: string,
+    // thumbnail: string,
+    // domain: string,
+    // contributions: {
+    //   entity_type: string;
+    //   text: string;
+    //   html: string;
+    // }[],
+    // idToken: string
+  };
+
   return (
     <div>
-      {metadata ? (
-        <div>
-          <div>{metadata.description}</div>
-          <div>{metadata.domain}</div>
-          <div>{metadata.entity_type}</div>
-          <div>{metadata.name}</div>
-          <div>{metadata.thumbnail}</div>
+      <div>
+        {metadata ? (
+          <div>
+            <div>{metadata.description}</div>
+            <div>{metadata.domain}</div>
+            <div>{metadata.entity_type}</div>
+            <div>{metadata.name}</div>
+            <div>{metadata.thumbnail}</div>
+          </div>
+        ) : (
+          <div>Loading...</div>
+        )}
+      </div>
+      <div>
+        {!highlights
+          ? null
+          : Object.keys(highlights).map((id) => {
+              const { text } = highlights[id];
+
+              return (
+                <div key={id} style={{ backgroundColor: "yellow" }}>
+                  {text}
+                </div>
+              );
+            })}
+        <div className="whs-mt-4" onClick={onSave}>
+          Save link
         </div>
-      ) : (
-        <div>Loading...</div>
-      )}
+      </div>
     </div>
   );
 };
@@ -51,36 +114,6 @@ const Hightlight = () => {
     <>
       <button onClick={handleSaveClick}>Save</button>
     </>
-  );
-};
-
-const HighlightListAndSave = () => {
-  const [highlights, setHighlights] = useState<any[]>([]);
-
-  useEffect(() => {
-    chrome.storage.local.get(null, (result: any) => {
-      setHighlights(result);
-    });
-  }, []);
-
-  const onSave = () => {
-    console.log("heuyu save");
-  };
-
-  return (
-    <div>
-      {Object.keys(highlights).map((id) => {
-        const { text, color } = highlights[id];
-        return (
-          <div key={id} style={{ backgroundColor: color }}>
-            {text}
-          </div>
-        );
-      })}
-      <div className="whs-mt-4" onClick={onSave}>
-        Save link
-      </div>
-    </div>
   );
 };
 
@@ -105,8 +138,7 @@ const Popup = () => {
           <SignUp setIsLogedIn={setIsLogedIn} />
         ) : (
           <div className="mb-10">
-            <WebsiteMetadata />
-            <HighlightListAndSave />
+            <LoginContent />
           </div>
         )}
       </div>

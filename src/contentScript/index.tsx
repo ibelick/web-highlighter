@@ -2,12 +2,22 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import "../assets/css/tailwind.css";
 import { ContentScript } from "./ContentScript";
+import type { Highlight } from "../types/notes";
 
 const highlightPage = () => {
+  // get current url
+  const currentUrl = window.location.href;
+
+  console.log("url", currentUrl);
+  // filter items by url
+
   chrome.storage.local.get((items) => {
-    Object.keys(items).forEach((key) => {
-      const highlight = items[key];
-      const text = highlight.text;
+    const currentUrlItems: Highlight[] = items[currentUrl];
+
+    console.log("currentUrlItems", currentUrlItems);
+
+    return currentUrlItems.forEach((item) => {
+      const text = item.text;
 
       // Search for text within all text nodes on the page
       const walker = document.createTreeWalker(
@@ -21,7 +31,7 @@ const highlightPage = () => {
         if (index !== -1) {
           // Create a new element to wrap the highlighted text
           const span = document.createElement("span");
-          span.style.backgroundColor = highlight.color;
+          span.style.backgroundColor = "yellow";
           span.textContent = text;
 
           // Split the text node at the index where the text was found
