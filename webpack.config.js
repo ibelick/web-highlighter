@@ -89,7 +89,7 @@ function getHtmlPlugins(chunks) {
   return chunks.map(
     (chunk) =>
       new HtmlPlugin({
-        title: "Chrome Extension with ReactJs",
+        title: "Web highlighter sublime",
         filename: `${chunk}.html`,
         chunks: [chunk],
       })

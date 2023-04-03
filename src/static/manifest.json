@@ -1,6 +1,6 @@
 {
-  "name": "Chrome Extension With React",
-  "description": "This is the boilerplate for the chrome extension with React",
+  "name": "Web highlighter sublime",
+  "description": "Web highlighter sublime",
   "version": "1.0.0",
   "manifest_version": 3,
   "icons": {
@@ -9,7 +9,7 @@
     "128": "logo.png"
   },
   "action": {
-    "default_title": "Chrome Extension With React",
+    "default_title": "Web highlighter sublime",
     "default_popup": "popup.html"
   },
   "background": {

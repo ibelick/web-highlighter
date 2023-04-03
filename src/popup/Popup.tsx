@@ -4,6 +4,7 @@ import { addEntity, getPreview } from "./api/notes";
 import type { GetPreviewResponse } from "./api/notes";
 import type { Highlight } from "../types/notes";
 import { getToken } from "./api/auth";
+import Button from "./components/Button";
 
 type Highlights = Highlight[];
 
@@ -19,6 +20,8 @@ const LoginContent = () => {
     const getPreviewLinkMetadata = async (url: string) => {
       const idToken = localStorage.getItem("token-whs");
       const data = await getPreview(url, idToken);
+
+      console.log("data", data);
 
       setMetadata(data);
     };
@@ -36,7 +39,11 @@ const LoginContent = () => {
   }, [token]);
 
   const refreshToken = async () => {
+    // NOTES: This is a temporary solution
+    // We need to implement a refresh token flow
     const data = await getToken("test@test.com");
+    console.log("data", data);
+
     localStorage.setItem("token-whs", data.idToken);
     setToken(data.idToken);
   };
@@ -66,34 +73,55 @@ const LoginContent = () => {
   return (
     <div>
       <div>
+        <h2 className="whs-text-lg whs-mb-2">Metadata</h2>
+      </div>
+      <div className="whs-mb-4">
         {metadata ? (
           <div>
-            <div>{metadata.description}</div>
-            <div>{metadata.domain}</div>
-            <div>{metadata.entity_type}</div>
-            <div>{metadata.name}</div>
-            <div>{metadata.thumbnail}</div>
+            <div className="whs-font-semibold whs-text-slate-900">
+              Description
+            </div>
+            <div className="whs-text-gray-700 whs-mb-1">
+              {metadata.description}
+            </div>
+            <div className="whs-font-semibold whs-text-slate-900">Domain</div>
+            <div className="whs-text-gray-700 whs-mb-1">{metadata.domain}</div>
+            <div className="whs-font-semibold whs-text-slate-900">
+              Entity type
+            </div>
+            <div className="whs-text-gray-700 whs-mb-1">
+              {metadata.entity_type}
+            </div>
+            <div className="whs-font-semibold whs-text-slate-900">Name</div>
+            <div className="whs-text-gray-700 whs-mb-1">{metadata.name}</div>
+            <div className="whs-font-semibold whs-text-slate-900">
+              Thumbnail
+            </div>
+            <div className="whs-text-gray-700 whs-mb-1">
+              {metadata.thumbnail}
+            </div>
           </div>
-        ) : (
-          <div>Loading...</div>
-        )}
+        ) : null}
       </div>
       <div>
-        {!highlights
-          ? null
-          : Object.keys(highlights).map((id) => {
-              const { text } = highlights[id];
+        <h2 className="whs-text-lg whs-mb-2">Highlighted</h2>
+        <div className="whs-mb-2">
+          {!highlights
+            ? null
+            : Object.keys(highlights).map((id) => {
+                const { text } = highlights[id];
 
-              return (
-                <div key={id} style={{ backgroundColor: "yellow" }}>
-                  {text}
-                </div>
-              );
-            })}
-        <div className="whs-mt-4" onClick={onSave}>
-          Save link
+                return (
+                  <div key={id} className="whs-mb-2 whs-text-gray-700">
+                    {text}
+                  </div>
+                );
+              })}
         </div>
-        <div onClick={refreshToken}>refresh token</div>
+        <Button onClick={onSave}>Save link</Button>
+        <div onClick={refreshToken} className="whs-mt-2 whs-cursor-pointer">
+          Refresh token
+        </div>
       </div>
     </div>
   );
@@ -114,9 +142,6 @@ const Popup = () => {
     <div id="app">
       <div className="whs-w-72">
         <div className="whs-p-4">
-          <h1 className="whs-text-base whs-mb-4 whs-font-medium">
-            Sublime highlighter
-          </h1>
           {!isLogedIn ? (
             <SignUp setIsLogedIn={setIsLogedIn} />
           ) : (

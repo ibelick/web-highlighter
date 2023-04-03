@@ -37,8 +37,6 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 async function init() {
-  console.log("Initializing content script");
-
   const appContainer = document.createElement("div");
   document.body.appendChild(appContainer);
 
